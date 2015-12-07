@@ -13,7 +13,6 @@ class classUtil
 {
 	private $CHARS='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	private $BASE = 62;
-
 	function encode($val) {
 		$str = '';
 		do {
@@ -41,13 +40,11 @@ class classUtil
 		mysql_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASS) or die('Could not connect to database');
 		mysql_select_db(MYSQL_DB) or die('Could not select database');	
 	}
-
 	// Return the id for a given url; -1 if doesn't exists
 	function get_id($url)
 	{
 		$q = "SELECT id FROM ".URL_TABLE." WHERE url='".$url."'";
 		$result = mysql_query($q);
-
 		if ( mysql_num_rows($result) )
 		{
 			$row = mysql_fetch_array($result);
@@ -62,14 +59,12 @@ class classUtil
 			return -1;
 		}
 	}
-
 	// Return the url for a given id; -1 if doesn't exists
 	function get_url($id)
 	{
 		$de_id = $this->decode($id);	// get decoded id
 		$q = 'SELECT url FROM '.URL_TABLE.' WHERE (id="'.$de_id.'")';
 		$result = mysql_query($q);
-
 		if ( mysql_num_rows($result) )
 		{
 			$row = mysql_fetch_array($result);
@@ -98,7 +93,5 @@ class classUtil
 			return mysql_query($q);
 		}
 	}
-
 }
-
 ?>

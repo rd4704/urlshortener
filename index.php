@@ -4,6 +4,7 @@
 // DATE         PROGRAMMER AND DETAILS
 // 07-12-15     Rahul Sharma    	Original
 // 									Added feature to store shorten url mappings to mysql
+//									Enabled URL rewrite rules for cleaner URL
 //
 //-------------------------------------------------------------------------------------
 -->
@@ -26,7 +27,14 @@ if ( isset($_POST['url']) )
 	// add the url to the database
 	if ($classUtil->insert_url($url))
 	{
-		$url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?id='.$classUtil->get_id($url);		
+        if ( REWRITE ) // mod_rewrite style link
+		{
+			$url = 'http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['PHP_SELF']).'/'.$classUtil->get_id($url);
+		}
+		else // regular GET style link
+		{
+			$url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'?id='.$classUtil->get_id($url);
+		}
 
 		$response = '<p>Short URL is: <a href="'.$url.'">'.$url.'</a></p>';
 	}
@@ -38,11 +46,16 @@ if ( isset($_POST['url']) )
 else // Handle url redirect requests from short urls
 {
 	// GET id
-	if ( isset($_GET['id']))
+	if ( isset($_GET['id']) ) // check GET first
 	{
 		$id = mysql_escape_string($_GET['id']);
 	}
-	else
+	elseif ( REWRITE ) // check the URI if we're using mod_rewrite
+	{
+		$exploded = explode('/', $_SERVER['REQUEST_URI']);
+		$id = mysql_escape_string($exploded[count($exploded)-1]);
+	}
+	else // otherwise, just make it empty
 	{
 		$id = '';
 	}
