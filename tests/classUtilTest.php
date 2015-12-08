@@ -44,16 +44,16 @@ class utilTest extends PHPUnit_Framework_TestCase
 		$result = $query->execute();
         $this->assertEquals(true, $result);
 		
+		$conn->commit();		// force  commit to get the inserted id	(1)
+		
 		// Check if user get correct url from ID
-		// $id = $util->get_id($test_url);	// Get id for temp record
-        // $this->assertEquals(1, $id);
+		$id = $util->get_id($test_url);	// Get id for temp record
+        $this->assertEquals(1, $id);
 		
 		// Delete the temp record
 		$query = $conn->prepare("delete from tbl_urls where id = 1");
         $results = $query->execute();
-		$newId = $conn->lastInsertId();
-		
-		$conn->commit();
+		$newId = $conn->lastInsertId();		
     }
 }
 ?>

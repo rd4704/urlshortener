@@ -86,7 +86,7 @@ else // Handle url redirect requests from short urls
 		<title><?php echo PAGE_TITLE; ?></title>
 	</head>
 	
-	<body onload="document.getElementById('url').focus()">
+	<body style="width:800px; margin:0 auto;" onload="document.getElementById('url').focus()">
 		
 		<h1><?php echo PAGE_TITLE; ?></h1>
 		
