@@ -4,6 +4,7 @@
 // DATE         PROGRAMMER AND DETAILS
 // 07-12-15     Rahul Sharma    	Original
 //									Added feature to store shorten uri mapping to database
+//	08-12-15	Rahul Sharma		Converted mysql query functions to PDO equivalent
 //
 //-------------------------------------------------------------------------------------
 -->
@@ -13,6 +14,8 @@ class classUtil
 {
 	private $CHARS='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	private $BASE = 62;
+	private $db;
+
 	function encode($val) {
 		$str = '';
 		do {
@@ -32,25 +35,30 @@ class classUtil
 		}
 		return $val;
 	}
-	
-	// constructor
-	function classUtil()
-	{
-		// open mysql connection
-		mysql_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASS) or die('Could not connect to database');
-		mysql_select_db(MYSQL_DB) or die('Could not select database');	
+		
+	public function getConnection() {
+		$dbHandle = null;
+		try {
+			$dbHandle = new PDO("mysql:host=".MYSQL_HOST.";dbname=".MYSQL_DB, MYSQL_USER, MYSQL_PASS);
+		} catch (PDOException $e) {
+			echo $e->getMessage();
+		}
+		return $dbHandle;
 	}
+	
 	// Return the id for a given url; -1 if doesn't exists
 	function get_id($url)
 	{
+        $conn = $this->getConnection();
 		$q = "SELECT id FROM ".URL_TABLE." WHERE url='".$url."'";
-		$result = mysql_query($q);
-		if ( mysql_num_rows($result) )
+        $stmt = $conn->prepare($q);
+		$stmt->execute(); 
+		$row = $stmt->fetch();
+		
+		if ($row)
 		{
-			$row = mysql_fetch_array($result);
-			
-			// generate alpahnumeric id from table table id
-			$en_id = $this->encode($row['id']);
+			// generate alpahnumeric id from table id
+			$en_id = $this->encode($row[0]);
 			
 			return $en_id;
 		}
@@ -59,15 +67,19 @@ class classUtil
 			return -1;
 		}
 	}
+
 	// Return the url for a given id; -1 if doesn't exists
 	function get_url($id)
 	{
+		$conn = $this->getConnection();
 		$de_id = $this->decode($id);	// get decoded id
 		$q = 'SELECT url FROM '.URL_TABLE.' WHERE (id="'.$de_id.'")';
-		$result = mysql_query($q);
-		if ( mysql_num_rows($result) )
-		{
-			$row = mysql_fetch_array($result);
+		$stmt = $conn->prepare($q);
+		$stmt->execute(); 
+		$row = $stmt->fetch();
+		
+		if ($row)
+		{			
 			return $row['url'];
 		}
 		else
@@ -79,6 +91,7 @@ class classUtil
 	// Add an url to the database
 	function insert_url($url)
 	{
+		$conn = $this->getConnection();
 		// check to see if the url's already in the table
 		$id = $this->get_id($url);
 		
@@ -90,8 +103,12 @@ class classUtil
 		else // otherwise insert 
 		{
 			$q = 'INSERT INTO '.URL_TABLE.' (url, createdon) VALUES ("'.$url.'", NOW())';
-			return mysql_query($q);
+			$query = $conn->prepare($q);
+			$results = $query->execute();
+			return $results;
 		}
 	}
+
 }
+
 ?>

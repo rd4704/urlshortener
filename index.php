@@ -5,6 +5,7 @@
 // 07-12-15     Rahul Sharma    	Original
 // 									Added feature to store shorten url mappings to mysql
 //									Enabled URL rewrite rules for cleaner URL
+//	08-12-15	Rahul Sharma		Fixed Fieldset width
 //
 //-------------------------------------------------------------------------------------
 -->
@@ -83,7 +84,6 @@ else // Handle url redirect requests from short urls
 
 	<head>
 		<title><?php echo PAGE_TITLE; ?></title>
-
 	</head>
 	
 	<body onload="document.getElementById('url').focus()">
@@ -94,7 +94,7 @@ else // Handle url redirect requests from short urls
 		
 		<form action="<?php echo $_SERVER['PHP_SELF']?>" method="post">
 		
-			<fieldset>
+			<fieldset style="width:500px">
 				<label for="url">Enter a long URL:</label>
 				<input type="text" name="url" id="url" />
 				<input type="submit" name="submit" id="submit" value="Shortify!" />
